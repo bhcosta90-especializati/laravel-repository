@@ -15,8 +15,7 @@
         "jeroennoten/laravel-adminlte": "^3.5",
         "kris/laravel-form-builder": "^1.40",
         "laravel/framework": "^8.12",
-        "laravel/tinker": "^2.5",
-        "okipa/laravel-table": "^4.0"
+        "laravel/tinker": "^2.5"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",

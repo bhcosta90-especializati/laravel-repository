@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Web\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUpdateProduct;
-use App\Models\Product;
+use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -12,15 +12,15 @@ class ProductController extends Controller
 {
     const TOTAL_PAGE = 15;
 
-    private Product $product;
+    private ProductRepositoryInterface $product;
 
     /**
      * ProductController constructor.
-     * @param Product $product
+     * @param ProductRepositoryInterface $repository
      */
-    public function __construct(Product $product)
+    public function __construct(ProductRepositoryInterface $repository)
     {
-        $this->product = $product;
+        $this->repository = $repository;
     }
 
 
@@ -31,7 +31,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = $this->product->with('category')->paginate(self::TOTAL_PAGE);
+        $products = $this->repository->with('category')->paginate(self::TOTAL_PAGE);
         return view('admin.products.index', compact('products'));
     }
 
@@ -53,29 +53,31 @@ class ProductController extends Controller
      */
     public function store(StoreUpdateProduct $request)
     {
-        $this->product->create($request->validated());
+        $this->repository->create($request->validated());
         return redirect()->route('admin.products.index')->withSuccess('Produto cadastrado com sucesso');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param Product $product
+     * @param int $id
      * @return Response
      */
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = $this->repository->findById($id);
         return view('admin.products.show', compact('product'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param Product $product
+     * @param int $id
      * @return Response
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
+        $product = $this->repository->findById($id);
         return view('admin.products.edit', compact('product'));
     }
 
@@ -83,58 +85,31 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      *
      * @param StoreUpdateProduct $request
-     * @param Product $product
+     * @param int $id
      * @return Response
      */
-    public function update(StoreUpdateProduct $request, Product $product)
+    public function update(StoreUpdateProduct $request, $id)
     {
-        $product->update($request->validated());
+        $this->repository->update($id, $request->validated());
         return redirect()->route('admin.products.index')->withSuccess('Produto editado com sucesso');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Product $product
+     * @param int $id
      * @return Response
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        $product->delete();
+        $this->repository->delete($id);
         return redirect()->route('admin.products.index');
     }
 
     public function search(Request $request)
     {
-        $name = $request->name;
-        $url = $request->url;
-        $description = $request->description;
-        $category = $request->category_id;
-
-        $products = $this->product
-            ->where(function($builder) use($name, $url, $description, $category){
-                if($name){
-                    $builder->where('name', $name);
-                }
-
-                if($url){
-                    $builder->orWhere('url', $url);
-                }
-
-                if($description){
-                    $builder->orWhere('description', 'LIKE', "%{$description}%");
-                }
-
-                if($category){
-                    $builder->orWhere('category_id', $category);
-                }
-
-            })
-            ->with('category')
-            ->orderBy('id', 'desc')
-            ->paginate(self::TOTAL_PAGE);
-
         $data = $request->except('_token');
+        $products = $this->repository->search($data);
 
         return view('admin.products.index', compact('products', 'data'));
     }

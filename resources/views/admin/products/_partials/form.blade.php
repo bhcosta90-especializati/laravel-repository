@@ -2,9 +2,6 @@
     <input type="text" value="{{ old('name') ?? $product->name ?? '' }}" name="name" id="name" class="form-control" placeholder="Nome do Produto">
 </div>
 <div class="form-group">
-    <input type="text" value="{{ old('url') ?? $product->url ?? '' }}" name="url" id="url" class="form-control" placeholder="URL do Produto">
-</div>
-<div class="form-group">
     <select class="form-control" name="category_id">
         <option value="">Categoria</option>
         @foreach($categories as $key => $rs)

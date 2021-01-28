@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -15,6 +16,10 @@ class Product extends Model
 
         static::addGlobalScope('orderByPrice', function($builder){
             $builder->orderBy('price', 'asc');
+        });
+
+        static::saving(function($obj){
+            $obj->url = Str::kebab($obj->name);
         });
     }
 

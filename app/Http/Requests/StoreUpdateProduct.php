@@ -23,12 +23,11 @@ class StoreUpdateProduct extends FormRequest
      */
     public function rules()
     {
-        $id = $this->route('product')->id ?? null;
+        $id = $this->route('product');
 
         return [
             'category_id' => ['required', 'exists:categories,id'],
             'name' => ['required', 'min:0', 'max:255', "unique:products,name,{$id},id"],
-            'url' => ['required', 'min:0', 'max:255', "unique:products,url,{$id},id"],
             'description' => ['nullable', 'max:2000'],
             'price' => ['required', 'numeric', 'min:0']
         ];

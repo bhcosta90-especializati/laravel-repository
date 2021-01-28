@@ -4,29 +4,41 @@ namespace App\Http\Controllers\Web\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUpdateCategory;
+use App\Repositories\Contracts\CategoryRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
     const TOTAL_PAGE = 15;
+
+    private CategoryRepositoryInterface $repository;
+
+    /**
+     * ProductController constructor.
+     * @param CategoryRepositoryInterface $repository
+     */
+    public function __construct(CategoryRepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+    }
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
-        $categories = DB::table('categories')
-            ->orderBy('id', 'desc')
-            ->paginate(self::TOTAL_PAGE);
+        $categories = $this->repository->orderBy('id', 'DESC')->paginate(self::TOTAL_PAGE);
         return view('admin.categories.index', compact('categories'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -37,11 +49,11 @@ class CategoryController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  StoreUpdateCategory $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(StoreUpdateCategory $request)
     {
-        DB::table('categories')->insert($request->validated());
+        $this->repository->create($request->validated());
         return redirect()->route('admin.categories.index')->withSuccess('Categoria cadastrada com sucesso');
     }
 
@@ -49,12 +61,11 @@ class CategoryController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
-        $category = DB::table('categories')->where('id', $id)->first();
-
+        $category = $this->repository->findById($id);
         if(!$category->id)
             return redirect()->back();
 
@@ -65,11 +76,11 @@ class CategoryController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
-        $category = DB::table('categories')->where('id', $id)->first();
+        $category = $this->repository->findById($id);
         return view('admin.categories.edit', compact('category'));
     }
 
@@ -78,11 +89,11 @@ class CategoryController extends Controller
      *
      * @param  StoreUpdateCategory  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(StoreUpdateCategory $request, $id)
     {
-        DB::table('categories')->where('id', $id)->update($request->validated());
+        $this->repository->update($id, $request->validated());
         return redirect()->route('admin.categories.index')->withSuccess('Categoria editada com sucesso');
     }
 
@@ -90,46 +101,18 @@ class CategoryController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
-        DB::table('categories')->where('id', $id)->delete();
+        $this->repository->delete($id);
         return redirect()->route('admin.categories.index');
     }
 
     public function search(Request $request)
     {
-//        $search = $request->search;
-//        $categories = DB::table('categories')
-//            ->where('name', $search)
-//            ->orWhere('url', $search)
-//            ->orWhere('description', 'LIKE', "%{$search}%")->get();
-
-        $name = $request->name;
-        $url = $request->url;
-        $description = $request->description;
-
-        $categories = DB::table('categories')
-            ->where(function($builder) use($name, $url, $description){
-                if($name){
-                    $builder->where('name', $name);
-                }
-
-                if($url){
-                    $builder->orWhere('url', $url);
-                }
-
-                if($description){
-                    $builder->orWhere('description', 'LIKE', "%{$description}%");
-                }
-
-            })
-            ->orderBy('id', 'desc')
-            ->paginate(self::TOTAL_PAGE);
-
         $data = $request->except('_token');
-
+        $categories = $this->repository->search($data);
         return view('admin.categories.index', compact('categories', 'data'));
     }
 }

@@ -26,7 +26,6 @@ class StoreUpdateCategory extends FormRequest
         $id = $this->route('category');
         return [
             'name' => ['required', 'min:0', 'max:255', "unique:categories,name,{$id},id"],
-            'url' => ['required', 'min:0', 'max:255', "unique:categories,url,{$id},id"],
             'description' => ['nullable', 'max:2000'],
         ];
     }
