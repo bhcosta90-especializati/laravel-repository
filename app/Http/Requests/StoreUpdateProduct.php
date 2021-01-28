@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreUpdateCategory extends FormRequest
+class StoreUpdateProduct extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,14 @@ class StoreUpdateCategory extends FormRequest
      */
     public function rules()
     {
-        $id = $this->route('category');
+        $id = $this->route('product')->id ?? null;
+
         return [
-            'name' => ['required', 'min:0', 'max:255', "unique:categories,name,{$id},id"],
-            'url' => ['required', 'min:0', 'max:255', "unique:categories,url,{$id},id"],
+            'category_id' => ['required', 'exists:categories,id'],
+            'name' => ['required', 'min:0', 'max:255', "unique:products,name,{$id},id"],
+            'url' => ['required', 'min:0', 'max:255', "unique:products,url,{$id},id"],
             'description' => ['nullable', 'max:2000'],
+            'price' => ['required', 'numeric', 'min:0']
         ];
     }
 }

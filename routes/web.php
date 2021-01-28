@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\{HomeController};
-use App\Http\Controllers\Web\Admin\{CategoryController, DashboardController, UserController};
+use App\Http\Controllers\Web\Admin\{CategoryController, DashboardController, ProductController, UserController};
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,8 +29,14 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin', 'as' => 'admin.'], fu
     /*
      * Route list to categories
      */
-    Route::post('/categories/search', [CategoryController::class, 'search'])->name('categories.search');
+    Route::any('/categories/search', [CategoryController::class, 'search'])->name('categories.search');
     Route::resource('categories', CategoryController::class);
+
+    /*
+     * Route list to products
+     */
+    Route::any('/products/search', [ProductController::class, 'search'])->name('products.search');
+    Route::resource('products', ProductController::class);
 
 });
 

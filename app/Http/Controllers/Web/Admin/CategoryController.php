@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
-    const TOTAL_PAGE = 2;
+    const TOTAL_PAGE = 15;
     /**
      * Display a listing of the resource.
      *
@@ -128,7 +128,7 @@ class CategoryController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(self::TOTAL_PAGE);
 
-        $data = $request->all();
+        $data = $request->except('_token');
 
         return view('admin.categories.index', compact('categories', 'data'));
     }
