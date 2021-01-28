@@ -105,6 +105,12 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
+        if($total = $this->repository->totalProductsByCategoryId($id) > 0){
+            return redirect()->route('admin.categories.index')
+                ->withErrors(__('Não pode deletar a categoria, pois existe(m) :products produto(s) vinculado(s)', [
+                    'products' => $total
+                ]));
+        }
         $this->repository->delete($id);
         return redirect()->route('admin.categories.index');
     }

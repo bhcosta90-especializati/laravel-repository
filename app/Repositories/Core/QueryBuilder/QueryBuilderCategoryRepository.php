@@ -49,6 +49,12 @@ class QueryBuilderCategoryRepository extends BaseQueryBuilderRepository implemen
             ->paginate();
     }
 
+    public function totalProductsByCategoryId($id): int
+    {
+        return $this->db->table('products')->where('category_id', $id)->count();
+    }
+
+
     protected function table()
     {
         return 'categories';

@@ -39,5 +39,12 @@ class EloquentCategoryRepository extends BaseEloquentRepository implements Categ
             ->paginate();
     }
 
+    public function totalProductsByCategoryId($id): int
+    {
+        return $this->entity->whereHas('products', function($query) use($id){
+            $query->where('products.category_id', $id);
+        })->count();
+    }
+
 
 }

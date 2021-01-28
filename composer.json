@@ -37,8 +37,7 @@
     "extra": {
         "laravel": {
             "dont-discover": [
-                "laravel/telescope",
-                "barryvdh/laravel-debugbar"
+                "laravel/telescope"
             ]
         }
     },
