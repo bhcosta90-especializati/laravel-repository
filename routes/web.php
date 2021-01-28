@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\{HomeController};
-use App\Http\Controllers\Web\Admin\{DashboardController, UserController};
+use App\Http\Controllers\Web\Admin\{CategoryController, DashboardController, UserController};
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,11 +16,22 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::get('/admin', [DashboardController::class, 'index'])->middleware(['auth'])->name('admin');
+
 Route::group(['middleware' => 'auth', 'prefix' => 'admin', 'as' => 'admin.'], function () {
-    Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
-        Route::resource('user', UserController::class);
+    /*
+     * Route list to users
+     */
+    Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
+        Route::resource('users', UserController::class);
     });
+
+    /*
+     * Route list to categories
+     */
+    Route::post('/categories/search', [CategoryController::class, 'search'])->name('categories.search');
+    Route::resource('categories', CategoryController::class);
+
 });
 
 require __DIR__ . '/auth.php';
